@@ -1,6 +1,9 @@
-[![Build
-Status](https://travis-ci.org/google/easypki.svg?branch=master)](https://travis-ci.org/google/easypki)
-[![codecov](https://codecov.io/gh/google/easypki/branch/master/graph/badge.svg)](https://codecov.io/gh/google/easypki)
+Note that this is a private fork of an unmaintained repository.  I
+have altered some of the links and names below to make this work, but
+I've left all of the licensing information and credits untouched.
+
+The original code is at https://github.com/google/easypki 
+
 
 easypki
 ======
@@ -11,7 +14,7 @@ CLI.
 
 # API
 
-[![godoc](https://godoc.org/github.com/google/easypki?status.svg)](https://godoc.org/github.com/google/easypki)
+[![godoc](https://godoc.org/github.com/borud/easypki?status.svg)](https://godoc.org/github.com/borud/easypki)
 
 For the latest API:
 
@@ -38,7 +41,7 @@ compatible with openssl, so you are not restrained.
 
 ```
 # Get the CLI:
-go get github.com/google/easypki/cmd/easypki
+go get github.com/borud/easypki/cmd/easypki
 
 
 # You can also pass the following through arguments if you do not want to use
