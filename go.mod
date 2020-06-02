@@ -8,3 +8,11 @@ require (
 	github.com/google/easypki v1.1.0
 	github.com/urfave/cli v1.22.2
 )
+
+replace github.com/google/easypki => ./
+
+replace github.com/google/easypki/pkg/store => ./pkg/store
+
+replace github.com/google/easypki/pkg/easkypki => ./pkg/easkypki
+
+replace github.com/google/easypki/pkg/certificate => ./pkg/certificate

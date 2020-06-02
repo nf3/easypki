@@ -42,6 +42,7 @@ var (
 type Request struct {
 	Name                string
 	IsClientCertificate bool
+	IsNonCRLCa          bool
 	PrivateKeySize      int
 	Template            *x509.Certificate
 }
