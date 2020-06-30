@@ -73,10 +73,12 @@ func (r *router) create(c *cli.Context) {
 		subject.OrganizationalUnit = []string{str}
 	}
 
+    //CRLDistroUrl := []string{"http://localhost/test.crl"}
 	template := &x509.Certificate{
 		Subject:    subject,
 		NotAfter:   time.Now().AddDate(0, 0, c.Int("expire")),
 		MaxPathLen: c.Int("max-path-len"),
+		//CRLDistributionPoints: CRLDistroUrl,
 	}
 
 	var signer *certificate.Bundle
@@ -104,13 +106,16 @@ func (r *router) create(c *cli.Context) {
 		}
 		template.IPAddresses = IPs
 		template.DNSNames = c.StringSlice("dns")
+		template.CRLDistributionPoints = c.StringSlice("crl-dist")
 	}
 
 	req := &easypki.Request{
 		Name:                filename,
 		Template:            template,
 		IsClientCertificate: c.Bool("client"),
+		IsNonCRLCa:          c.Bool("caNonCRL"),
 		PrivateKeySize:      c.Int("private-key-size"),
+		BasicConstraints:      c.Int("basicConstraints"),
 	}
 	if err := r.PKI.Sign(signer, req); err != nil {
 		log.Fatal(err)
@@ -207,6 +212,10 @@ func (r *router) run() {
 					Usage: "certificate authority",
 				},
 				cli.BoolFlag{
+					Name:  "caNonCRL",
+					Usage: "certificate authority for a CA that cant sign CRL, used for testing",
+				},
+				cli.BoolFlag{
 					Name:  "intermediate",
 					Usage: "intermediate certificate authority; implies --ca",
 				},
@@ -215,6 +224,11 @@ func (r *router) run() {
 					Name:  "max-path-len",
 					Usage: "intermediate maximum path length",
 					Value: -1, // default to less-than 0 when not defined
+				},
+				cli.IntFlag{
+					Name:  "basicConstraints",
+					Usage: "Sets the basicConstraints Flag 0-false, 1-true, 2-absent",
+					Value: 1, // default to true when not defined, most CAs need this and this is only used for testing
 				},
 				cli.BoolFlag{
 					Name:  "client",
@@ -267,6 +281,10 @@ func (r *router) run() {
 				cli.StringSliceFlag{
 					Name:  "email, e",
 					Usage: "Email alt names",
+				},
+				cli.StringSliceFlag{
+					Name:  "crl-dist",
+					Usage: "CRL distrobution point",
 				},
 			},
 		},

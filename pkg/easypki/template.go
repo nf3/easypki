@@ -48,8 +48,20 @@ func defaultTemplate(genReq *Request, publicKey crypto.PublicKey) error {
 }
 
 func caTemplate(genReq *Request, intermediateCA bool) error {
-	genReq.Template.KeyUsage = x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign | x509.KeyUsageCRLSign
-	genReq.Template.BasicConstraintsValid = true
+	if !genReq.IsNonCRLCa {
+		genReq.Template.KeyUsage = x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign | x509.KeyUsageCRLSign
+	} else {
+		genReq.Template.KeyUsage = x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign
+	}
+
+	if genReq.BasicConstraints != 2 {
+		if genReq.BasicConstraints == 0 {
+			genReq.Template.BasicConstraintsValid = false
+		} else {
+			genReq.Template.BasicConstraintsValid = true
+		}
+	}
+	
 	genReq.Template.MaxPathLenZero = true
 
 	if intermediateCA {
