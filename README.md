@@ -1,7 +1,3 @@
-[![Build
-Status](https://travis-ci.org/google/easypki.svg?branch=master)](https://travis-ci.org/google/easypki)
-[![codecov](https://codecov.io/gh/google/easypki/branch/master/graph/badge.svg)](https://codecov.io/gh/google/easypki)
-
 easypki
 ======
 
@@ -9,27 +5,6 @@ Easy Public Key Infrastructure intends to provide most of the components needed
 to manage a PKI, so you can either use the API in your automation, or use the
 CLI.
 
-# API
-
-[![godoc](https://godoc.org/github.com/google/easypki?status.svg)](https://godoc.org/github.com/google/easypki)
-
-For the latest API:
-
-```
-import "gopkg.in/google/easypki.v1"
-```
-
-## Legacy API
-
-API below pkg/ has been rewritten to allow extensibility in terms of PKI
-storage and better readability.
-
-If you used the legacy API that was only writing files to disk, a tag has been
-applied so you can still import it:
-
-```
-import "gopkg.in/google/easypki.v0"
-```
 
 # CLI
 
@@ -37,12 +12,13 @@ Current implementation of the CLI uses the local store and uses a structure
 compatible with openssl, so you are not restrained.
 
 ```
-# Get the CLI:
-go get github.com/google/easypki/cmd/easypki
+# Get the source code:
+git clone https://github.com/nf3/easypki.git
 
 
 # You can also pass the following through arguments if you do not want to use
 # env variables.
+# You can set them manually or run ./getstarted.sh
 export PKI_ROOT=/tmp/pki
 export PKI_ORGANIZATION="Acme Inc."
 export PKI_ORGANIZATIONAL_UNIT=IT
@@ -52,13 +28,23 @@ export PKI_PROVINCE="New York"
 
 mkdir $PKI_ROOT
 
+# To run ./getstarted.sh
+source ./getstarted.sh
+
+#Set the go environment do the build and then install
+go env
+go build ./...
+go install ./...
+
 # Create the root CA:
+# The value passed as the filename will be the same value that you pass into future commands as the --ca-name in order to sign new certs using this CA
 easypki create --filename root --ca "Acme Inc. Certificate Authority"
 
 # In the following commands, ca-name corresponds to the filename containing
 # the CA.
 
 # Create a server certificate for blog.acme.com and www.acme.com:
+# Note the 2 --dns parameters are to set the SAN but the last www.acme.com param looks like it is a duplicate, but it is argument for the Common Name CN
 easypki create --ca-name root --dns blog.acme.com --dns www.acme.com www.acme.com
 
 # Create an intermediate CA:
@@ -75,11 +61,32 @@ easypki revoke $PKI_ROOT/root/certs/www.acme.com.crt
 
 # Generate a CRL expiring in 1 day (PEM Output on stdout):
 easypki crl --ca-name root --expire 1
+
+# Generate a CA without the proper Basic Constraint of CA:true
+easypki create --basicConstraints 0 --filename root_bc_false --ca "Acme Inc. Certificate Authority bc false"
 ```
+
 You will find the generated certificates in `$PKI_ROOT/ca_name/certs/` and
 private keys in `$PKI_ROOT/ca_name/keys/`
 
 For more info about available flags, checkout out the help `easypki -h`.
+
+```
+## OpenSSL command that you can use to verify or inspect the certs
+
+# To look at the cert properties after it is generated
+openssl x509 -in ~/certs/root_bc_false/certs/root_bc_false.crt -text
+
+# To verify that the certificate chain is valid
+# This should pass even if the CA root was created without the proper Basic Constraint
+openssl verify -CAfile ~/certs/root/certs/root.crt ~/certs/root/certs/leafcert.example.com.crt
+
+# To verify that the certificate chain is valid even under strict mode
+# This should fail if the CA root was created without the proper Basic Constraint
+openssl verify -x509_strict -CAfile ~/certs/root/certs/root.crt ~/certs/root/certs/leafcert.example.com.crt
+
+
+```
 
 # Disclaimer
 
