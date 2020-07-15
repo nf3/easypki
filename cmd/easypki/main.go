@@ -114,6 +114,7 @@ func (r *router) create(c *cli.Context) {
 		Template:            template,
 		IsClientCertificate: c.Bool("client"),
 		IsNonCRLCa:          c.Bool("caNonCRL"),
+		IsNonSigningCa:      c.Bool("caNonSigning"),
 		PrivateKeySize:      c.Int("private-key-size"),
 		BasicConstraints:      c.Int("basicConstraints"),
 	}
@@ -214,6 +215,10 @@ func (r *router) run() {
 				cli.BoolFlag{
 					Name:  "caNonCRL",
 					Usage: "certificate authority for a CA that cant sign CRL, used for testing",
+				},
+				cli.BoolFlag{
+					Name:  "caNonSigning",
+					Usage: "certificate authority for a CA that cant sign certificates, used for testing",
 				},
 				cli.BoolFlag{
 					Name:  "intermediate",

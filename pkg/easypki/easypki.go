@@ -43,6 +43,7 @@ type Request struct {
 	Name                string
 	IsClientCertificate bool
 	IsNonCRLCa          bool
+	IsNonSigningCa      bool
 	PrivateKeySize      int
 	BasicConstraints	int
 	Template            *x509.Certificate

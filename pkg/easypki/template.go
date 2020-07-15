@@ -54,6 +54,10 @@ func caTemplate(genReq *Request, intermediateCA bool) error {
 		genReq.Template.KeyUsage = x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign
 	}
 
+	if !genReq.IsNonSigningCa {
+		genReq.Template.KeyUsage = x509.KeyUsageDigitalSignature 
+	}
+
 	if genReq.BasicConstraints != 2 {
 		if genReq.BasicConstraints == 0 {
 			genReq.Template.BasicConstraintsValid = false
